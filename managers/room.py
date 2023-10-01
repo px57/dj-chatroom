@@ -18,7 +18,6 @@ class RoomManager:
         self.user_list = []
         self.messages = load_last_100_message()
 
-
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ [FIND]
     def find_userindex_by_consumer(self, consumer):
         """

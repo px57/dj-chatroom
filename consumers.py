@@ -50,3 +50,8 @@ class ChatRoomConsumer(WebsocketConsumer):
         USERINCHAT.room.send_allpeople({
             'new_message': new_message
         })
+
+    def receive__init(self, message):
+        """
+            @description: Init.
+        """
