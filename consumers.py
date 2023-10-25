@@ -84,7 +84,7 @@ class ChatRoomConsumer(WebsocketConsumer):
             'new_room': dbChatRoom.serialize()
         }))
 
-    def receive__delete_room(self, chatroom): 
+    def receive__delete_room(self, chatroom):
         """
             @description: 
         """
@@ -96,13 +96,16 @@ class ChatRoomConsumer(WebsocketConsumer):
         if not dbChatRoomList.exists():
             return; 
         
+        # INTERFACE>>>[BEFORE_DELETE_CHATROOM]
         self.interface.event_before_delete_chatroom(
             self,
             dbChatRoomList.first(),
             dbProfile,
         )
+
         dbChatRoomList.delete()
 
+        # INTERFACE>>>[AFTER_DELETE_CHATROOM]
         self.interface.event_after_delete_chatroom(
             self,
             dbChatRoomList.first(),

@@ -4,7 +4,8 @@ from .models import ChatRoom, Message
 @admin.register(ChatRoom)
 class ChatRoomAdmin(admin.ModelAdmin):
     list_display = [
-        'id',        
+        'id',
+        'name',
     ]
 
 
@@ -13,4 +14,5 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'chatroom',
+        'content'
     ]
