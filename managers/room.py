@@ -85,8 +85,20 @@ class RoomManager:
             content=message,
         )
         dbMessage.save()
+
+        dbMessageReplyTest = Message(
+            chatroom=dbChatRoom,
+            profile=profile,
+            content='reply test',
+            replyTo=dbMessage,
+        )
+        dbMessageReplyTest.save()
+
         self.messages = load_last_100_message(dbChatRoom)
-        return dbMessage.serialize(FakeRequest())
+        return [
+            dbMessage.serialize(FakeRequest()),
+            dbMessageReplyTest.serialize(FakeRequest()),
+        ]
 
     def __str__(self) -> str:
         """

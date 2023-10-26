@@ -58,7 +58,6 @@ class ChatRoomConsumer(WebsocketConsumer):
             @description:
         """
         USERINCHAT = self.scope['USERINCHAT']
-    
         new_message = USERINCHAT.room.create_new_message(
             USERINCHAT.profile, 
             message
