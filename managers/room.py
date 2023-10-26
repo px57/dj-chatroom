@@ -16,7 +16,8 @@ class RoomManager:
         self.room = room
         self.users_count = 0
         self.user_list = []
-        self.messages = load_last_100_message()
+        print ('room', room['db'])
+        self.messages = load_last_100_message(room['db'])
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ [FIND]
     def find_userindex_by_consumer(self, consumer):
@@ -84,7 +85,7 @@ class RoomManager:
             content=message,
         )
         dbMessage.save()
-        self.messages = load_last_100_message()
+        self.messages = load_last_100_message(dbChatRoom)
         return dbMessage.serialize(FakeRequest())
 
     def __str__(self) -> str:

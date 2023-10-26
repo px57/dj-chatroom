@@ -47,7 +47,7 @@ class ChatRoomDefaultInterface(InterfaceManager):
     def event_join_room(
             self: object, 
             consumer: object,
-            room_name: str, 
+            chatroom__id: int, 
             user__id: int,
         ):
         """
@@ -64,14 +64,14 @@ class ChatRoomDefaultInterface(InterfaceManager):
             return
         
         dbChatroom = ChatRoom.objects.filter(
-            name=room_name, 
-            # onwer=dbProfile
+            id=chatroom__id, 
+            onwer=dbProfile
         ).first()
 
         if dbChatroom is None:
             return
-
-        consumer.scope['USERINCHAT'] = CHATROOM_MANAGER.connect(room_name, consumer)
+        # TODO: Add the disconnect message. 
+        consumer.scope['USERINCHAT'] = CHATROOM_MANAGER.connect(dbChatroom, consumer)
 
     def event_before_delete_chatroom(
         self: object, 
@@ -86,7 +86,6 @@ class ChatRoomDefaultInterface(InterfaceManager):
             @params.dbProfile: The profile who delete the room. 
         """
         
-
     def event_after_delete_chatroom(
         self: object, 
         consumer: object,

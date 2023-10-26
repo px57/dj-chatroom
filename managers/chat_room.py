@@ -1,5 +1,5 @@
 from channels.generic.websocket import WebsocketConsumer
-from chatroom.models import ChatRoom, Message
+from chatroom.models import ChatRoom
 from profiles.models import Profile
 from chatroom.managers.room import RoomManager
 from chatroom.managers.user import ChatUser
@@ -23,77 +23,77 @@ class ChatRoomManager:
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ [CREATE]
 
-    def create_new_dbRoom(self, room_name: str) -> ChatRoom:
-        """
-            @description: create new room
-        """
-        dbChatRoom = ChatRoom.objects.create(name=room_name)
-        dbChatRoom.save()
-        return dbChatRoom
+
 
     def __create_room__incache(self, dbChatRoom: ChatRoom) -> None:
         """
             @description: create room in cache
         """
-        if self.__find_dbRoom_by_name__incache(dbChatRoom.name) is not None:
+        if self.__find_dbRoom_by_name__incache(dbChatRoom.id) is not None:
             return None
         
-        self.room_list[dbChatRoom.name] = {
+        self.room_list[dbChatRoom.id] = {
             "db": dbChatRoom,
         }
-        self.room_list[dbChatRoom.name].update({
+        self.room_list[dbChatRoom.id].update({
             "last_use": datetime.now(),  
-            "roomManager": RoomManager(self.room_list[dbChatRoom.name]),
+            "roomManager": RoomManager(self.room_list[dbChatRoom.id]),
         })
         return None
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ [FIND]
-    def __find_dbRoom_by_name__incache(self, room_name: str) -> ChatRoom:
+    def __find_dbRoom_by_name__incache(self, room_id: int) -> ChatRoom:
         """
             @description: find room by name in cache
         """
         # -> ChatRoom
-        if room_name in self.room_list:
-            return self.room_list[room_name]["db"]
+        if room_id in self.room_list:
+            return self.room_list[room_id]["db"]
         return None
     
-    def find_dbRoom_by_name(self, room_name: str) -> ChatRoom:
+    def find_dbRoom_by_name(self, room_id: int) -> ChatRoom:
         """
             @description: find room by name
         """
-        dbChatRoom = self.__find_dbRoom_by_name__incache(room_name)
+        dbChatRoom = self.__find_dbRoom_by_name__incache(room_id)
         if dbChatRoom is not None:
             return dbChatRoom
         
-        dbChatRoom = ChatRoom.objects.filter(name=room_name).first()
+        dbChatRoom = ChatRoom.objects.filter(name=room_id).first()
         return dbChatRoom
     
-    def find_or_create_dbRoom(self, room_name: str) -> ChatRoom:
+    def find_or_create_dbRoom(self, dbChatRoom: ChatRoom) -> ChatRoom:
         """
             @description: 
         """
-        dbChatRoom = self.find_dbRoom_by_name(room_name)
-        if dbChatRoom is None:
-            dbChatRoom = self.create_new_dbRoom(room_name)
-
         self.__create_room__incache(dbChatRoom)
         return dbChatRoom
     
-    def find_room_by_name(self, room_name: str) -> dict:
+    def find_room_by_id(
+            self: object, 
+            room_id: int
+        ) -> dict or None: 
         """
-            @description: find room by name
+            @description: 
         """
-        if room_name in self.room_list:
-            return self.room_list[room_name]
+        if room_id in self.room_list:
+            return self.room_list[room_id]
         return None
     
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ [CONNECT]
-    def connect(self, room_name: str, consumer: WebsocketConsumer) -> None:
+    def connect(
+        self: object, 
+        dbChatRoom: ChatRoom, 
+        consumer: WebsocketConsumer
+    ) -> None:
         """
             @description: connect user to room
+            @params.dbChatRoom: The room to connect.
+            @params.consumer: The consumer to connect.
+
         """
-        self.find_or_create_dbRoom(room_name)
-        room = self.find_room_by_name(room_name)
+        self.find_or_create_dbRoom(dbChatRoom)
+        room = self.find_room_by_id(dbChatRoom.id)
         return room["roomManager"].connect(consumer)
 
 

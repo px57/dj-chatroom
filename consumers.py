@@ -2,7 +2,6 @@
 import json
 
 from channels.generic.websocket import WebsocketConsumer
-from chatroom.libs import load_last_100_message, serialize_messages_list
 from chatroom.managers.chat_room import CHATROOM_MANAGER
 from kernel.websocket.decorators import websocket__simplifier
 from kernel.http.request import FakeRequest
@@ -46,11 +45,11 @@ class ChatRoomConsumer(WebsocketConsumer):
             @description:
             @param.data: {'name': 'aoeu', 'profile__id': 2}
         """ 
-        room_name = data.get('name')
+        chatroom__id = data.get('chatroom__id')
         user__id = data.get('user__id')    
         self.interface.event_join_room(
             self,
-            room_name, 
+            chatroom__id, 
             user__id
         )
 
@@ -59,9 +58,12 @@ class ChatRoomConsumer(WebsocketConsumer):
             @description:
         """
         USERINCHAT = self.scope['USERINCHAT']
-        # todo: check if message is valid
+    
+        new_message = USERINCHAT.room.create_new_message(
+            USERINCHAT.profile, 
+            message
+        )
 
-        new_message = USERINCHAT.room.create_new_message(USERINCHAT.profile, message)
         USERINCHAT.room.send_allpeople({
             'new_message': new_message
         })
