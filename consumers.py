@@ -18,7 +18,9 @@ class ChatRoomConsumer(WebsocketConsumer):
     @load_interface(CHATROOM_RULESTACK)
     def connect(self):
         self.accept()
+        print ('################################ [4]')
         self.interface.event_init_consumer(self)
+        print ('################################ [5]')
 
     def disconnect(self, close_code):
         """
@@ -46,7 +48,7 @@ class ChatRoomConsumer(WebsocketConsumer):
             @param.data: {'name': 'aoeu', 'profile__id': 2}
         """ 
         chatroom__id = data.get('chatroom__id')
-        user__id = data.get('user__id')    
+        user__id = data.get('user__id')
         self.interface.event_join_room(
             self,
             chatroom__id, 
