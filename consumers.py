@@ -61,9 +61,13 @@ class ChatRoomConsumer(WebsocketConsumer):
         USERINCHAT = self.scope['USERINCHAT']
         # todo: check if message is valid
 
-        new_message = USERINCHAT.room.create_new_message(USERINCHAT.profile, message)
+        request_message = USERINCHAT.room.create_new_message(USERINCHAT.profile, message)
+
         USERINCHAT.room.send_allpeople({
-            'new_message': new_message
+            'new_message': request_message
+        })
+        USERINCHAT.room.send_allpeople({
+            'new_message': reply_message
         })
 
     def receive__init(self, message):

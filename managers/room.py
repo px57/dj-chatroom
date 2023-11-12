@@ -73,6 +73,20 @@ class RoomManager:
         """
         pass
 
+    # def create_new_message(self, profile, message):
+    #     """
+    #         @description: create new message
+    #     """
+    #     dbChatRoom = self.room.get('db')
+    #     dbMessage = Message(
+    #         chatroom=dbChatRoom,
+    #         profile=profile,
+    #         content=message,
+    #     )
+    #     dbMessage.save()
+    #     self.messages = load_last_100_message()
+    #     return dbMessage.serialize(FakeRequest())
+
     def create_new_message(self, profile, message):
         """
             @description: create new message
@@ -84,8 +98,22 @@ class RoomManager:
             content=message,
         )
         dbMessage.save()
+
+        dbMessageReplyTest = Message(
+            chatroom=dbChatRoom,
+            profile=profile,
+            content='reply test',
+            replyTo=dbMessage,
+        )
+        dbMessageReplyTest.save()
+
+        # self.messages = load_last_100_message(dbChatRoom)
         self.messages = load_last_100_message()
-        return dbMessage.serialize(FakeRequest())
+
+        return [
+            dbMessage.serialize(FakeRequest()),
+            dbMessageReplyTest.serialize(FakeRequest()),
+        ]
 
     def __str__(self) -> str:
         """
