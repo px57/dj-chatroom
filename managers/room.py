@@ -86,6 +86,8 @@ class RoomManager:
         )
         dbMessage.save()
 
+        ai_reply = 'reply test'
+
         dbMessageReplyTest = Message(
             chatroom=dbChatRoom,
             profile=profile,
