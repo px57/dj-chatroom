@@ -114,9 +114,11 @@ class RoomManager:
 
         print(f"ai_response : {ai_response}")
 
-        ai_response = json.dumps(ai_response)
+        ai_response_formatted = json.dumps(ai_response).replace('"', '\\"')
 
-        return ai_response
+        print(f"ai_response : {ai_response_formatted}")
+
+        return ai_response_formatted
 
     def create_new_message(self, profile, message):
         """
