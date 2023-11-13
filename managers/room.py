@@ -5,6 +5,7 @@ from chatroom.models import Message
 from kernel.http.request import FakeRequest
 
 # burger
+import ast
 import json
 from ia_workspace.tools.chat_ai_engine import AISemanticChat
 
@@ -102,21 +103,25 @@ class RoomManager:
 
         try:
             # Attempt to parse the string as JSON
+
             parsed_message = json.loads(message)
+            # print(f"json_parsed_message : {parsed_message}")
+
             if isinstance(parsed_message, dict):
+                # print("---Expand Suggestion---")
                 ai_response = self.ai_engine.get_ai_response_for_suggestion_expand(parsed_message)
             else:
                 return "There is an error with the message, it is a JSON string but not a dictionary."
 
         except json.JSONDecodeError:
             # The string is not JSON
+            # print("---Contextual Response---")
             ai_response = self.ai_engine.get_ai_response_from_general_query(message)
 
-        print(f"ai_response : {ai_response}")
+        # print(f"ai_response : {ai_response}")
 
-        ai_response_formatted = json.dumps(ai_response).replace('"', '\\"')
-
-        print(f"ai_response : {ai_response_formatted}")
+        # If we do a json dumps here it will be done again and re
+        ai_response_formatted = json.dumps(ai_response)
 
         return ai_response_formatted
 
@@ -124,6 +129,7 @@ class RoomManager:
         """
             @description: create new message
         """
+
         dbChatRoom = self.room.get('db')
         dbMessage = Message(
             chatroom=dbChatRoom,
