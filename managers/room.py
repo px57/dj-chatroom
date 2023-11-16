@@ -70,8 +70,18 @@ class RoomManager:
         """
             @description: send message
         """
+        count = 0
         for user in self.user_list:
+            count += 1
+            print(f"Sending message to user {count}.")
             user.send_message(message)
+
+    # def send_to_self(self, self_user, message: dict) -> None:
+    #     """
+    #         @description: send message
+    #     """
+    #     for user in self.user_list:
+    #         user.send_message(message)
 
 
     def receive(self):
@@ -80,7 +90,7 @@ class RoomManager:
         """
         pass
     
-    def get_ai_response( self, message: str ) :   
+    def create_new_ai_message( self, profile, message ) :   
         """
             @description: RoomManager class
             @params : message = request from the client. Either :
@@ -118,14 +128,15 @@ class RoomManager:
             # print("---Contextual Response---")
             ai_response = self.ai_engine.get_ai_response_from_general_query(message)
 
-        # print(f"ai_response : {ai_response}")
+        print(f"ai_response : {ai_response}")
 
         # If we do a json dumps here it will be done again and re
         ai_response_formatted = json.dumps(ai_response)
 
-        return ai_response_formatted
+    
+        return self.create_new_message(profile, ai_response_formatted, message_type='ai')
 
-    def create_new_message(self, profile, message):
+    def create_new_message(self, profile, message, message_type='user'):
         """
             @description: create new message
         """
@@ -135,21 +146,14 @@ class RoomManager:
             chatroom=dbChatRoom,
             profile=profile,
             content=message,
+            messageType=message_type
         )
         dbMessage.save()
-
-        dbMessageReplyTest = Message(
-            chatroom=dbChatRoom,
-            profile=profile,
-            content=self.get_ai_response(message),
-            replyTo=dbMessage,
-        )
-        dbMessageReplyTest.save()
 
         self.messages = load_last_100_message(dbChatRoom)
         return [
             dbMessage.serialize(FakeRequest()),
-            dbMessageReplyTest.serialize(FakeRequest()),
+            # dbMessageReplyTest.serialize(FakeRequest()),
         ]
 
     def __str__(self) -> str:

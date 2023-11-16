@@ -55,10 +55,11 @@ class ChatRoomConsumer(WebsocketConsumer):
             user__id
         )
 
-    def receive__new_message(self, message):
+    def receive__new_message(self, message, ai_reply=True):
         """
             @description:
         """
+        #Sending user message to all
         USERINCHAT = self.scope['USERINCHAT']
         new_message = USERINCHAT.room.create_new_message(
             USERINCHAT.profile, 
@@ -68,6 +69,18 @@ class ChatRoomConsumer(WebsocketConsumer):
         USERINCHAT.room.send_allpeople({
             'new_message': new_message
         })
+
+
+        #Sending AI message to all
+        new_message = USERINCHAT.room.create_new_ai_message(
+            USERINCHAT.profile, 
+            message
+        )
+
+        USERINCHAT.room.send_allpeople({
+            'new_message_ai': new_message
+        })
+
 
     def receive__init(self, message):
         """

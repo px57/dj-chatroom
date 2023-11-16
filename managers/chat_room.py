@@ -94,6 +94,8 @@ class ChatRoomManager:
         """
         self.find_or_create_dbRoom(dbChatRoom)
         room = self.find_room_by_id(dbChatRoom.id)
+
+        print( f"room :{room}" )
         return room["roomManager"].connect(consumer)
 
 

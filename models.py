@@ -55,6 +55,12 @@ class Message(BaseMetadataModel):
         blank=True
     )
 
+    messageType = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True
+    )
+
     chatroom = models.ForeignKey(
         ChatRoom,
         on_delete=models.CASCADE,
