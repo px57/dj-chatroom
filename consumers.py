@@ -33,6 +33,8 @@ class ChatRoomConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         actions = json.loads(text_data)
+
+        # print
         for action in actions:
             real_action_name = 'receive__' + action
             if not hasattr(self, real_action_name):
@@ -55,28 +57,76 @@ class ChatRoomConsumer(WebsocketConsumer):
             user__id
         )
 
-    def receive__new_message(self, message, ai_reply=True):
+    def receive__initial_settings(self, settings):
+    # Assuming 'self' has access to the current chatroom instance
+        USERINCHAT = self.scope['USERINCHAT']
+        dbChatRoom = USERINCHAT.room.room.get('db')
+
+        if dbChatRoom:
+            dbChatRoom.industry = settings.get('industry')
+            dbChatRoom.geography = settings.get('geography')
+            dbChatRoom.companyType = settings.get('company_type')
+            dbChatRoom.save()
+            print( f"Saved dbChatRoom : {dbChatRoom.industry} - {dbChatRoom.geography} - {dbChatRoom.companyType}" )
+
+
+        # USERINCHAT = self.scope['USERINCHAT']
+        # new_message = USERINCHAT.room.create_new_message(
+        #     USERINCHAT.profile, 
+        #     message
+        # )
+
+        # USERINCHAT.room.send_allpeople({
+        #     'new_message': new_message
+        # })
+
+
+        # #Sending AI message to all
+        # new_message = USERINCHAT.room.create_new_ai_message(
+        #     USERINCHAT.profile, 
+        #     message
+        # )
+
+        # USERINCHAT.room.send_allpeople({
+        #     'new_message_ai': new_message
+        # })
+    def receive__new_message(self, data):
         """
             @description:
         """
+        print(f"receive__new_message data : {data}")
+        # message = data["message"]
+        # type = data["type"]
         #Sending user message to all
+        message = data.get('new_message')
+        type = data.get('type')
+
+        print(f"message : {message} - type : {type}")
+
+        # Sending the user message
+        print(f"Creating the user messag")
         USERINCHAT = self.scope['USERINCHAT']
         new_message = USERINCHAT.room.create_new_message(
             USERINCHAT.profile, 
-            message
+            message,
+            type
         )
 
+        print(f"Sendinng the user messag")
         USERINCHAT.room.send_allpeople({
             'new_message': new_message
         })
 
 
         #Sending AI message to all
+        print(f"Genenrating AI message")
         new_message = USERINCHAT.room.create_new_ai_message(
             USERINCHAT.profile, 
-            message
+            message,
+            type
         )
 
+        print(f"Sending AI message to all")
         USERINCHAT.room.send_allpeople({
             'new_message_ai': new_message
         })

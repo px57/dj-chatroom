@@ -19,6 +19,24 @@ class ChatRoom(BaseMetadataModel):
         blank=True
     )
 
+    industry = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True  # Set the default value here
+    )
+    
+    geography = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True  # Set the default value here
+    )    
+    
+    companyType = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True # Set the default value here
+    )
+
     onwer = models.ForeignKey(
         Profile,
         on_delete=models.CASCADE,

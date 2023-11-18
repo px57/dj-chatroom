@@ -41,8 +41,10 @@ class RoomManager:
             @description: connect
         """
         userinchat = ChatUser(consumer, self)
-        self.user_list.append(userinchat)
-        self.users_count += 1
+        if len(self.user_list) <= 0 : self.user_list.append(userinchat)
+        else: self.user_list[0] = userinchat
+
+        self.users_count = 1
 
         userinchat.send_message({
             'messages': serialize_messages_list(self.messages),
@@ -90,7 +92,7 @@ class RoomManager:
         """
         pass
     
-    def create_new_ai_message( self, profile, message ) :   
+    def create_new_ai_message( self, profile, message, type ) :   
         """
             @description: RoomManager class
             @params : message = request from the client. Either :
@@ -110,10 +112,13 @@ class RoomManager:
         print(f"message : {message}")
 
         ai_response = "There is an error with the reponse generation"
+        response_type = 'new_message_ai'
 
-        try:
-            # Attempt to parse the string as JSON
+        if type == 'new_message' : 
+            ai_response = self.ai_engine.get_ai_response_from_general_query(message)
 
+        elif type == 'new_message_user_ext':
+            response_type = "new_message_ai_ext"
             parsed_message = json.loads(message)
             # print(f"json_parsed_message : {parsed_message}")
 
@@ -123,20 +128,15 @@ class RoomManager:
             else:
                 return "There is an error with the message, it is a JSON string but not a dictionary."
 
-        except json.JSONDecodeError:
-            # The string is not JSON
-            # print("---Contextual Response---")
-            ai_response = self.ai_engine.get_ai_response_from_general_query(message)
-
         print(f"ai_response : {ai_response}")
 
         # If we do a json dumps here it will be done again and re
         ai_response_formatted = json.dumps(ai_response)
 
     
-        return self.create_new_message(profile, ai_response_formatted, message_type='ai')
+        return self.create_new_message(profile, ai_response_formatted, type=response_type)
 
-    def create_new_message(self, profile, message, message_type='user'):
+    def create_new_message(self, profile, message, type='user'):
         """
             @description: create new message
         """
@@ -146,7 +146,7 @@ class RoomManager:
             chatroom=dbChatRoom,
             profile=profile,
             content=message,
-            messageType=message_type
+            messageType=type
         )
         dbMessage.save()
 
